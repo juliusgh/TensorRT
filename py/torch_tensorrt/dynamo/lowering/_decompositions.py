@@ -333,6 +333,7 @@ def scatter_reduce_decomposition(
     reduce: str,
 ) -> torch.Tensor:
     scatter_loop_tensor = input_tensor
+    device_input_tensor = input_tensor.device
     # required for mean reduce operation
     scatter_count_tensor = torch.zeros_like(input_tensor)
     src_shape = list(src_tensor.shape)
@@ -344,12 +345,11 @@ def scatter_reduce_decomposition(
         # unsqueeze src and index in dim
         src_slice = torch.unsqueeze(src_slice, dim)
         index_slice = torch.unsqueeze(index_slice, dim)
-        device = to_torch_device(default_device())
 
         # moving tensor to default device
-        scatter_loop_tensor = scatter_loop_tensor.to(device)
-        index_slice = index_slice.to(device)
-        src_slice = src_slice.to(device)
+        scatter_loop_tensor = scatter_loop_tensor.to(device_input_tensor)
+        index_slice = index_slice.to(device_input_tensor)
+        src_slice = src_slice.to(device_input_tensor)
         if reduce == "sum":
             reduceOp = ReduceOperation.SUM
         elif reduce == "prod":
