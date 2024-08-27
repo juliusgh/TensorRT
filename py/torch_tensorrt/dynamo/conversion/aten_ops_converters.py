@@ -17,6 +17,7 @@ from torch_tensorrt.dynamo.conversion._ConverterRegistry import (
 from torch_tensorrt.dynamo.conversion.converter_utils import (
     enforce_tensor_types,
     get_positive_dim,
+    has_dynamic_shape,
     is_only_operator_on_placeholder,
 )
 from torch_tensorrt.fx.types import TRTTensor
@@ -903,7 +904,22 @@ def aten_ops_slice(
     )
 
 
-@dynamo_tensorrt_converter(torch.ops.aten.chunk.default)
+def chunk_validator(node: Node) -> bool:
+    meta_data = node.args[0].meta.get("tensor_meta")
+    if meta_data is None:
+        return False
+    shape = meta_data.shape
+    dynamic_shape = has_dynamic_shape(shape)
+    if dynamic_shape:
+        return False
+    return True
+
+
+@dynamo_tensorrt_converter(
+    torch.ops.aten.chunk.default,
+    supports_dynamic_shapes=True,
+    capability_validator=chunk_validator,
+)
 @enforce_tensor_types(
     {
         0: (TRTTensor,),

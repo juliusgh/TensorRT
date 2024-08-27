@@ -27,6 +27,7 @@ class TestChunkConverter(DispatchTestCase):
         self.run_test(
             TestChunk(),
             input,
+            enable_passes=True,
         )
 
     @parameterized.expand(
@@ -51,6 +52,7 @@ class TestChunkConverter(DispatchTestCase):
         self.run_test(
             TestChunk(),
             input,
+            enable_passes=True,
         )
 
     @parameterized.expand(
@@ -75,6 +77,7 @@ class TestChunkConverter(DispatchTestCase):
         self.run_test(
             TestChunk(),
             input,
+            enable_passes=True,
         )
 
 
